@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
-import sys, os#, IPython
+import sys, os, IPython
 from scipy import signal as sig
 
 
@@ -36,6 +36,16 @@ def high_pass(signal, cutoff=20):
 
 
 # plot freq response
+def plot_fft(signal):
+	fft = np.fft.fft(signal)
+	# plt.plot(np.abs(fft))
+	x = np.linspace(-9796 / 2, 9796 / 2, len(fft), endpoint=True)
+	plt.plot(x, np.fft.fftshift(np.abs(fft)))
+	plt.ylim([0, 450])
+	# plt.show()
+	plt.savefig("data/plots/fft.png")
+	return
+
 # upsample to audio rate
 # play it
 
@@ -47,6 +57,7 @@ def analyze_video(i):
 	stream = get_frames("data/video " + str(i) + " frames")
 	signal = extract_signal(stream, pixel=512)
 	filtered = high_pass(signal, 20)
+	plot_fft(signal)
 	# IPython.embed()
 	return filtered
 
@@ -54,6 +65,7 @@ def analyze_video(i):
 
 
 if __name__ == "__main__":
-    print analyze_video(1)
+    # print analyze_video(1)
     # print analyze_video(2)
+    print analyze_video(3)
 
