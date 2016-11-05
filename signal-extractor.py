@@ -39,11 +39,12 @@ def high_pass(signal, cutoff=20):
 def plot_fft(signal):
 	fft = np.fft.fft(signal)
 	# plt.plot(np.abs(fft))
-	x = np.linspace(-9796 / 2, 9796 / 2, len(fft), endpoint=True)
+	x = np.linspace(-9796 / 2, 9796 / 2, len(fft), endpoint=True) / 2 / np.pi
 	plt.plot(x, np.fft.fftshift(np.abs(fft)))
 	plt.ylim([0, 450])
+	plt.xlim([-100, 100])
 	# plt.show()
-	plt.savefig("data/plots/fft.png")
+	plt.savefig("data/plots/fft-4.png")
 	return
 
 # upsample to audio rate
@@ -56,10 +57,10 @@ Main function for analyzing a video stream.
 def analyze_video(i):
 	stream = get_frames("data/video " + str(i) + " frames")
 	signal = extract_signal(stream, pixel=512)
-	filtered = high_pass(signal, 20)
+	# filtered = high_pass(signal, 20)
 	plot_fft(signal)
 	# IPython.embed()
-	return filtered
+	return
 
 
 
