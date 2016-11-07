@@ -38,11 +38,11 @@ def high_pass(signal, cutoff=20):
 # plot freq response
 def plot_fft(signal):
 	fft = np.fft.fft(signal)
-	timestep = 2 * np.pi/9795.9 # number of seconds between samples/lines
+	timestep = 1/9795.9 # number of seconds between samples/lines
 	freq_bins = np.fft.fftfreq(len(fft), d=timestep)
 	plt.plot(freq_bins, np.abs(fft))
 	plt.ylim([0, 450])
-	plt.xlim([-100, 100])
+	plt.xlim([-45, 45])
 	# plt.show()
 	plt.savefig("data/plots/fft-4.png")
 	return
@@ -69,4 +69,3 @@ if __name__ == "__main__":
     # print analyze_video(1)
     # print analyze_video(2)
     print analyze_video(3)
-
