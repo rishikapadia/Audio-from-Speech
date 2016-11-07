@@ -40,7 +40,11 @@ def plot_fft(signal):
 	fft = np.fft.fft(signal)
 	timestep = 1/9795.9 # number of seconds between samples/lines
 	freq_bins = np.fft.fftfreq(len(fft), d=timestep)
+	f = plt.figure()
 	plt.plot(freq_bins, np.abs(fft))
+	f.suptitle('FFT of 44Hz Signal', fontsize=20)
+	plt.xlabel('Frequency [Hz]', fontsize=18)
+	plt.ylabel('Count', fontsize=16)
 	plt.ylim([0, 450])
 	plt.xlim([-45, 45])
 	# plt.show()
