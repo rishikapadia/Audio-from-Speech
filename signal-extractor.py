@@ -68,6 +68,14 @@ def upsample(signal, duration):
 
 
 """
+Normalize signal to be between -1 to 1
+"""
+def normalize(signal):
+	signal = signal - np.mean(signal)
+	return signal / np.max(np.abs(signal))
+
+
+"""
 Play a signal as audio.
 """
 def play_audio(samples):
@@ -90,14 +98,18 @@ def save_audio(signal, directory_name):
 """
 Main function for analyzing a video stream.
 """
-def analyze_video(directory_name, should_plot=False, should_play=False, should_save=True):
+def analyze_video(directory_name, should_plot=True, should_play=False, should_save=False):
 	stream = get_frames("data/" + directory_name)
 	signal = extract_signal(stream, pixel=512)
+	signal = high_pass(signal, 20)
+
+	## Use for the 250 Hz signal
+	# signal = signal[10:-10] # there's some garbage in the beginning and end
+	# signal = normalize(signal)
 
 	if should_plot:
 		plot_fft(signal, directory_name)
 	
-	signal = high_pass(signal, 20)
 	signal = upsample(signal, 4.8)
 
 	if should_play:
