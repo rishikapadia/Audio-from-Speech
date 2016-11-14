@@ -3,8 +3,14 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
-import sys, os, IPython
+import sys, os, pyaudio, IPython
 from scipy import signal as sig
+from scipy.signal import resample
+from scipy.io import wavfile
+
+
+AUDIO_FS = 44100
+SAMPLING_FS = 5000
 
 
 """
@@ -29,8 +35,8 @@ def extract_signal(stream, pixel=0):
 """
 High pass filter to remove frequencies below 20 hz.
 """
-def high_pass(signal, cutoff=20):
-	hp_filter = sig.firwin(11, cutoff, pass_zero=False, nyq=9796)
+def high_pass(signal, cutoff=20, nyq=9796):
+	hp_filter = sig.firwin(11, cutoff, pass_zero=False, nyq=nyq)
 	hp_filter /= np.sum(hp_filter)
 	return sig.convolve(signal, hp_filter)
 
@@ -40,7 +46,7 @@ Plot and save frequency response as an image.
 """
 def plot_fft(signal, directory_name):
 	fft = np.fft.fft(signal)
-	timestep = 1.0/5000 # number of seconds between samples/lines
+	timestep = 1.0/SAMPLING_FS # number of seconds between samples/lines
 	freq_bins = np.fft.fftfreq(len(fft), d=timestep)
 	f = plt.figure()
 	plt.plot(freq_bins, np.abs(fft))
@@ -53,19 +59,52 @@ def plot_fft(signal, directory_name):
 	plt.savefig("data/plots/fft-" + directory_name + ".png")
 	return
 
-# upsample to audio rate
-# play it
+
+"""
+Upsample to audio rate. Duration in seconds of the input (and output) signal
+"""
+def upsample(signal, duration):
+	return resample(signal, int(AUDIO_FS * duration))
+
+
+"""
+Play a signal as audio.
+"""
+def play_audio(samples):
+    p = pyaudio.PyAudio()
+    ostream = p.open(format=pyaudio.paFloat32, channels=1, rate=AUDIO_FS,output=True)
+    ostream.write( samples.astype(np.float32).tostring() )
+    p.terminate()
+    return
+
+
+"""
+Save a signal as an audio WAV file.
+"""
+def save_audio(signal, directory_name):
+	wavfile.write("data/reconstructions/" + directory_name+'.wav', AUDIO_FS, signal)
+	return
+
 
 
 """
 Main function for analyzing a video stream.
 """
-def analyze_video(directory_name):
+def analyze_video(directory_name, should_plot=False, should_play=False, should_save=True):
 	stream = get_frames("data/" + directory_name)
 	signal = extract_signal(stream, pixel=512)
-	# filtered = high_pass(signal, 20)
-	plot_fft(signal, directory_name)
 
+	if should_plot:
+		plot_fft(signal, directory_name)
+	
+	signal = high_pass(signal, 20)
+	signal = upsample(signal, 4.8)
+
+	if should_play:
+		play_audio(signal)
+	
+	if should_save:
+		save_audio(signal, directory_name)
 	# IPython.embed()
 	return
 
@@ -92,5 +131,4 @@ if __name__ == "__main__":
     analyze_video("50_100 Hz")
     analyze_video("50_100 Hz - 2")
     analyze_video("50_160 Hz")
-
 
