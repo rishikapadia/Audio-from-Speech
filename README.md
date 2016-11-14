@@ -15,6 +15,8 @@ python signal-extractor.py
 
 ## Notes
 
+### Old framerate:
+
 * video duration: 2.45 seconds
 
 * framerate: 20.41 fps
@@ -26,4 +28,18 @@ python signal-extractor.py
 
 480 * 50 = 24000 lines scanned in 2.45 seconds ==> 9795.9 samples per second
 
+
+
+### New framerate:
+
+* video duration: 4.80 seconds
+
+* framerate: 10.41 fps
+
+* number of images: 50
+
+* image size: 480 x 1024
+
+
+480 * 50 = 24000 lines scanned in 4.8 seconds ==> 5000 samples per second
 
