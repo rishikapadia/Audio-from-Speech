@@ -12,4 +12,4 @@ a = [b[16:-4] for b in a]
 
 for b in a:
     call(['mkdir', 'data/'+b])
-    call(['ffmpeg', '-i', 'data/raw videos/'+b+'.avi', '-y', '-r', '10.41', 'data/'+b+'/frame%03d.png'])
+    call(['ffmpeg', '-i', 'data/raw videos/'+b+'.avi', '-y', '-r', '20.41', 'data/'+b+'/frame%03d.png'])
