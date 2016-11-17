@@ -120,15 +120,15 @@ def analyze_video(directory_name, should_plot=True, should_play=False, should_sa
 
 	if should_plot:
 		plot_fft(signal, directory_name)
-	
+
 	signal = upsample(signal, 4.8)
 
 	if should_play:
 		play_audio(signal)
-	
+
 	if should_save:
 		save_audio(signal, directory_name)
-	# IPython.embed()
+
 	return
 
 
@@ -161,5 +161,4 @@ if __name__ == "__main__":
     # analyze_video("50_160hz_seq_controlled")
     # analyze_video("skrillex")
     # analyze_video("rishi")
-
 
