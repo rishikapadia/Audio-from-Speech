@@ -105,11 +105,48 @@ def save_audio(signal, directory_name):
 	return
 
 
+"""
+Calculates the SNR for single frequency signals.
+Takes the target frequency, and calculates ratio assuming everything else is noise.
+"""
+def calculate_SNR(directory_name, frequency):
+	reconstructed = wavfile.read("data/reconstructions/" + directory_name + ".wav")[1]
+	fft = np.fft.fft(reconstructed)
+	fft = np.abs(fft) ** 2
+	index = int(1.0 * frequency / 44100 * len(fft))
+	power_signal = fft[index] + fft[-index+1]
+	power_noise = np.sum(fft) - power_signal
+	SNR = power_signal / power_noise
+	SNR_db = 10.0 * np.log10(SNR)
+	print directory_name + ":\t" + str(SNR) + "\t" + str(SNR_db)
+	return
+
+
+"""
+Calculates the SNR for arbitrary signals, given the input signal.
+Takes the original and reconstructed audio filenames.
+"""
+def calculate_SNR_music(original_name, reconstructed_name):
+	reconstructed = wavfile.read("data/reconstructions/" + reconstructed_name + ".wav")[1]
+	fft_rec = np.fft.fft(reconstructed)
+
+	original = wavfile.read("data/originals/" + original_name + ".wav")[1]
+	fft_orig = np.fft.fft(original)
+	if len(fft_orig.shape) > 1:
+		fft_orig = fft_orig[:,0]
+	fft_rec = resample(fft_rec, len(fft_orig))
+
+	SNR = np.abs(np.sum(fft_rec ** 2) / np.sum((fft_rec - fft_orig) ** 2))
+	SNR_db = 10.0 * np.log10(SNR)
+	print reconstructed_name + ":\t" + str(SNR) + "\t" + str(SNR_db)
+	return
+
+
 
 """
 Main function for analyzing a video stream.
 """
-def analyze_video(directory_name, should_plot=True, should_play=False, should_save=True, thresh=50):
+def analyze_video(directory_name, should_plot=False, should_play=False, should_save=False, thresh=50):
 	stream = get_frames("data/" + directory_name)
 	signal = extract_signal(stream, pixel=512)
 	signal = high_pass(signal, 20)
@@ -130,7 +167,6 @@ def analyze_video(directory_name, should_plot=True, should_play=False, should_sa
 		save_audio(signal, directory_name)
 
 	return
-
 
 
 
@@ -161,4 +197,16 @@ if __name__ == "__main__":
     # analyze_video("50_160hz_seq_controlled")
     # analyze_video("skrillex")
     # analyze_video("rishi")
+
+    # calculate_SNR("44 Hz", 44)
+    # calculate_SNR("50 Hz - 2", 50)
+    # calculate_SNR("100 Hz", 100)
+    # calculate_SNR("160 Hz", 160)
+    # calculate_SNR("250 Hz - 4", 250)
+    # calculate_SNR("500 Hz - 2", 500)
+
+    calculate_SNR_music("50_160hz", "50_160hz_controlled")
+    calculate_SNR_music("50_160_seq", "50_160hz_seq_controlled")
+    calculate_SNR_music("skrillex", "skrillex")
+
 
